@@ -18,16 +18,26 @@ the `smeterd` package directly from pypi (using pip):
 
     $ pip install smeterd
 
+If you want to edit the sources, you can clone the smeterd repo, edit, build and install.
 
-Alternatively you can manually clone `smeterd` and run setupttools `setup.py`:
+Make sure you have git, python3 and build installed.
+In my case I did install (on my Raspberry Pi W Zero; might not be the best way, but it worked):
+    $ sudo apt-get update
+    $ sudo apt-get upgrade
+    $ sudo apt install git
+    $ sudo apt-get install python3
+    $ sudo apt install python3-pip
+    $ pip3 install build
 
+Now clone the repo to your local system:
     $ git clone https://github.com/nrocco/smeterd.git
     $ cd smeterd
-    $ python setup.py install
-
-
-This will install the needed python libraries (in this case only pyserial)
-which are needed to start reading P1 packets.
+    
+If you want to change anything; now's the time: edit the sources
+Now build your smeterd (creates venv isolated env, installs necessary packages, build dist package) 
+    $ python3 -m build
+    $ cd dist
+    $ pip3 install smeterd-2.9.2-py2.py3-none-any.whl
 
 If you don't want to install `smeterd` as a package you can run it directly
 from the root directory of the git repository using the following command but
@@ -44,19 +54,13 @@ To get an idea of the available functionality see the `help` output:
 
     $ smeterd -h
 
-
-To make `smeterd` output more verbose use the `-v` option on any of the
-following commands. You can repeat the option to increase verbosity:
-
-    $ smeterd -vvv
-
-
 To get help for a specific subcommand use the `-h` or `--help` after
 having typed the subcommand:
 
     $ smeterd {subcommand} -h
-
-
+    like
+    $ smeterd read-meter -h
+    
 Read one packet from your meter using the following command:
 
     $ smeterd read-meter
