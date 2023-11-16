@@ -9,7 +9,7 @@ from smeterd.meter import SmartMeter
 @click.option('--elec-unit', help='electricity unit to use', default='Wh', type=click.Choice(['Wh', 'kWh', 'J', 'MJ']))
 @click.option('--gas-unit', help='gas unit to use. Caloric units (J, MJ) based on Dutch gas @ 43.94 MJ/m^3', default='m3', type=click.Choice(['m3', 'l', 'J', 'MJ']))
 @click.option('--raw', help='display packet in raw form', is_flag=True)
-@click.option('--serial-baudrate', help='baud rate such as 9600 or 115200 etc', type=int, default=9600)
+@click.option('--serial-baudrate', help='baud rate such as 9600 or 115200 etc', type=int, default=115200)
 @click.option('--serial-bytesize', help='number of data bits', default=str(serial.SEVENBITS), type=click.Choice(['5', '6', '7', '8']))
 @click.option('--serial-parity', help='enable parity checking', default=serial.PARITY_EVEN, type=click.Choice(['N', 'E', 'O', 'M', 'S']))
 @click.option('--serial-port', help='device name to read packets from', default=smeterd.__default_serial__)
@@ -17,7 +17,7 @@ from smeterd.meter import SmartMeter
 @click.option('--serial-timeout', help='set a read timeout value in seconds', default=10, type=int)
 @click.option('--serial-xonxoff', help='enable software flow control. By default software flow control is disabled', is_flag=True)
 @click.option('--serial-rts', help='Enable RTS flow control.', is_flag=True)
-@click.option('--show-output', help='choose output to display', default=('time', 'consumed', 'tariff', 'gas_measured_at'), multiple=True, type=click.Choice(['time', 'kwh_eid', 'gas_eid', 'consumed', 'tariff', 'gas_measured_at', 'produced', 'current']))
+@click.option('--show-output', help='choose output to display', default=('time', 'consumed', 'produced', 'voltage'), multiple=True, type=click.Choice(['time', 'kwh_eid', 'gas_eid', 'consumed', 'tariff', 'gas_measured_at', 'produced', 'current', 'voltage', 'amps', 'watts']))
 @click.option('--tsv', help='display packet in tab separated value form', is_flag=True)
 def read_meter(elec_unit, gas_unit, raw, serial_baudrate, serial_bytesize, serial_parity, serial_port, serial_stopbits, serial_timeout, serial_xonxoff, serial_rts, show_output, tsv):
     '''
@@ -71,6 +71,21 @@ def read_meter(elec_unit, gas_unit, raw, serial_baudrate, serial_bytesize, seria
         data.append(('Electricity serial', packet['kwh']['eid']))
     if ('gas_eid' in show_output):
         data.append(('Gas serial', packet['gas']['eid']))
+    if ('amps' in show_output):
+        data.extend([
+            ('L1 (Amps)', int(packet['instantaneous']['l1']['amps'])),
+            ('L2 (Amps)', int(packet['instantaneous']['l2']['amps'])),
+            ('L3 (Amps)', int(packet['instantaneous']['l3']['amps']))])
+    if ('watts' in show_output):
+        data.extend([
+            ('L1 (Watt)', int(packet['instantaneous']['l1']['watts'])),
+            ('L2 (Watt)', int(packet['instantaneous']['l2']['watts'])),
+            ('L3 (Watt)', int(packet['instantaneous']['l3']['watts']))])
+    if ('voltage' in show_output):
+        data.extend([
+            ('L1 (Volt)', int(packet['instantaneous']['l1']['volts'])),
+            ('L2 (Volt)', int(packet['instantaneous']['l2']['volts'])),
+            ('L3 (Volt)', int(packet['instantaneous']['l3']['volts']))])
     if ('consumed' in show_output):
         data.extend([
             ('Total electricity consumed (high, {})'.format(elec_unit), int(packet['kwh']['high']['consumed'] * elec_unit_factor[elec_unit])),

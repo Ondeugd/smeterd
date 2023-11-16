@@ -8,3 +8,11 @@ Used by Vattenfall and several Swedish grid operators.
 * Bytesize: 8
 * Parity: N
 * Stopbits: 1
+
+### Iskra AM550
+Used by Liander (Netherlands)
+* Baudrate: 115200  
+* Bytesize: 7
+* Parity: E
+* Stopbits: 1
+
