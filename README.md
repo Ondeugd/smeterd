@@ -62,14 +62,14 @@ usage as a cli application
 
 To get an idea of the available functionality see the `help` output:
 
-    $ smeterd -h
+    $ smeterd --help
 
-To get help for a specific subcommand use the `-h` or `--help` after
+To get help for a specific subcommand use the `--help` after
 having typed the subcommand:
 
-    $ smeterd {subcommand} -h
+    $ smeterd {subcommand} --help
     like
-    $ smeterd read-meter -h
+    $ smeterd read-meter --help
     
 Read one packet from your meter using the following command:
 
