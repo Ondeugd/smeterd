@@ -1,7 +1,7 @@
 smeterd
 =======
 
-![Continious Integration](https://github.com/nrocco/smeterd/workflows/Continious%20Integration/badge.svg?branch=master)
+Cloned from the original version by nrocco (thanks!): https://github.com/nrocco/smeterd 
 
 Read P1 smart meter packets in Python
 
@@ -18,10 +18,14 @@ the `smeterd` package directly from pypi (using pip):
 
     $ pip install smeterd
 
+building
+-----------------------
+
 If you want to edit the sources, you can clone the smeterd repo, edit, build and install.
 
 Make sure you have git, python3 and build installed.
-In my case I did install (on my Raspberry Pi W Zero; might not be the best way, but it worked):
+On my Raspberry Pi W Zero I had to install (note: might not be the best way, but it worked):
+
     $ sudo apt-get update
     $ sudo apt-get upgrade
     $ sudo apt install git
@@ -29,19 +33,25 @@ In my case I did install (on my Raspberry Pi W Zero; might not be the best way, 
     $ sudo apt install python3-pip
     $ pip3 install build
 
+Depending on your system, `python` could be linked to either python2 or python3.
+Make sure it's linked to python3 (you can check with ``ls -l `which python` ``) and if not, add an alias to your ~/.bashrc or ~/.bash_aliases file: `alias python=/usr/bin/python3`.
+
 Now clone the repo to your local system:
-    $ git clone https://github.com/nrocco/smeterd.git
+
+    $ git clone https://github.com/Ondeugd/smeterd.git
     $ cd smeterd
     
-If you want to change anything; now's the time: edit the sources
+If you want to change anything; now's the time: edit the sources (make sure to update the version in your setup.cfg if building a release version).
+
 Now build your smeterd (creates venv isolated env, installs necessary packages, build dist package) 
-    $ python3 -m build
+
+    $ python -m build
     $ cd dist
     $ pip3 install smeterd-2.9.2-py2.py3-none-any.whl
 
 If you don't want to install `smeterd` as a package you can run it directly
-from the root directory of the git repository using the following command but
-you are responsible for manually installing dependencies:
+from the root directory of the git repository using the following command 
+(but you'll have to install dependencies manually):
 
     $ python -m smeterd
 
@@ -72,8 +82,8 @@ Read one packet from your meter using the following command:
     Gas Measured At           1516562094
 
 
-By default the `read-meter` commands spits out the current date, total kwh1,
-total kwh2, total gas amounts and current kWh tariff on multiple lines.
+By default the `read-meter` commands spits out the some default measurements like 
+current date, total kwh1, total gas amounts etc on multiple lines.
 
 You can make it print the same values as a tab seperated list:
 
@@ -101,8 +111,8 @@ use the above command with the `--serial-port` option:
     $ smeterd read-meter --serial-port /dev/ttyS0
 
 
-Currently only kwh1, kwh2 and gas usage are read. If you specify the `--raw`
-command line option you will see the raw packet from the smart meter:
+If you specify the `--raw` command line option you will see the
+raw packet from the smart meter (with additional measured values):
 
     $ smeterd read-meter --raw
     /ISk5\2ME382-1004
