@@ -119,5 +119,9 @@ Explanation:
 
 This breakdown is based on the structure of the OBIS codes and their meanings as described in the provided sources.
 
-The Current in L1, L2 and L3 seems weird when looking at the Instantaneous active power in phase L1, L2 and L3.
-Might be caused by 
+The Current in L1, L2 and L3 seems a bit weird when looking at the Instantaneous active power in phase L1, L2 and L3.
+Might be caused by current between phases instead of between phase and N?
+
+Gas meter OBIS code for measurement datetime and value in m3 is 0-2:24.2.1.
+But the original code used 0-1:24.2.1 with a slightly different regex.
+I've received a new gasmeter some while back, so the 0-1 vs 0-2 might be because of that: old meter was 0-1, new one got a new id: 0-2.  
