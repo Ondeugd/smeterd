@@ -54,9 +54,9 @@ Explanation:
 - ${\textsf{\color{green}1-0:1.8.2}}$(006526.370\*kWh)  
   ${\textsf{\color{green}Positive active energy}}$ (A+) in tariff T2 [kWh]: 6526.370 kWh
 - ${\textsf{\color{green}1-0:2.8.1}}$(003063.961\*kWh)  
-  ${\textsf{\color{green}Negative active energy}}$ (A+) in tariff T1 [kWh]: 3063.961 kWh
+  ${\textsf{\color{green}Negative active energy}}$ (A-) in tariff T1 [kWh]: 3063.961 kWh
 - ${\textsf{\color{green}1-0:2.8.2}}$(007038.075\*kWh)  
-  ${\textsf{\color{green}Negative active energy}}$ (A+) in tariff T2 [kWh]: 7038.075 kWh
+  ${\textsf{\color{green}Negative active energy}}$ (A-) in tariff T2 [kWh]: 7038.075 kWh
 - 0-0:96.14.0(0002)  
   Number of long power failures: 2
 - ${\textsf{\color{green}1-0:1.7.0}}$(00.000\*kW)  
@@ -119,9 +119,7 @@ Explanation:
 
 This breakdown is based on the structure of the OBIS codes and their meanings as described in the provided sources.
 
-The Current in L1, L2 and L3 seems a bit weird when looking at the Instantaneous active power in phase L1, L2 and L3.
-Might be caused by current between phases instead of between phase and N?
-
+Note:
 Gas meter OBIS code for measurement datetime and value in m3 is 0-2:24.2.1.
-But the original code used 0-1:24.2.1 with a slightly different regex.
+But the original python code used 0-1:24.2.1 with a slightly different regex.
 I've received a new gasmeter some while back, so the 0-1 vs 0-2 might be because of that: old meter was 0-1, new one got a new id: 0-2.  
