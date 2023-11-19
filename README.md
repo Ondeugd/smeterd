@@ -5,7 +5,7 @@ Cloned from the original version by nrocco (thanks!): https://github.com/nrocco/
 
 Read P1 smart meter packets in Python
 
-[Supported meters](supported-meters.md)
+[Supported meters](supported-meters.md)  
 [Telegram OBIS explained](OBIS-raw-data-explained.md)
 
 installation
