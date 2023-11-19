@@ -119,6 +119,21 @@ Explanation:
 
 This breakdown is based on the structure of the OBIS codes and their meanings as described in the provided sources.
 
+
+| Electricity | Voltage | Current | Power A+ (consumption)| Power A- (production) |
+|---|---|---|---|---|
+|L1 	| 1-0:32.7.0 | 1-0:31.7.0 | 1-0:21.7.0 | 1-0:22.7.0
+|L2		| 1-0:52.7.0 | 1-0:51.7.0 | 1-0:41.7.0 | 1-0:42.7.0
+|L3		| 1-0:72.7.0 | 1-0:71.7.0 | 1-0:61.7.0 | 1-0:62.7.0
+||||||
+|Combined || tarif 1: | 1-0:1.8.1 | 1-0:2.8.1
+|		  || tarif 2: | 1-0:1.8.2 | 1-0:2.8.2
+|		  || total: 	 | 1-0:1.7.0 | 1-0:2.7.0
+||||||						
+| **Gas** |		**consumption (m3)**
+|meter 1|		0-1:24.2.1		
+|meter 2|		0-2:24.2.1	
+
 Note:
 Gas meter OBIS code for measurement datetime and value in m3 is 0-2:24.2.1.
 But the original python code used 0-1:24.2.1 with a slightly different regex.
