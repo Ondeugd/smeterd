@@ -23,7 +23,7 @@ Gas meter OBIS code for measurement datetime and value in m3 is 0-2:24.2.1.
 But the original python code used 0-1:24.2.1 with a slightly different regex.
 I've received a new gasmeter some while back, so the 0-1 vs 0-2 might be because of that: old meter was 0-1, new one got a new id: 0-2.  
 
-Snapshot of raw output:
+Some example raw output:
 
 1-3:0.2.8(50)  
 0-0:1.0.0(231117134202W)  

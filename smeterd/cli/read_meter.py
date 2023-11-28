@@ -6,8 +6,9 @@ from smeterd.meter import SmartMeter
 
 
 @click.command(context_settings=dict(auto_envvar_prefix='SMETERD', show_default=True))
-@click.option('--elec-unit', help='electricity unit to use', default='Wh', type=click.Choice(['Wh', 'kWh', 'J', 'MJ']))
+@click.option('--elec-unit', help='electricity unit to use', default='kWh', type=click.Choice(['Wh', 'kWh', 'J', 'MJ']))
 @click.option('--gas-unit', help='gas unit to use. Caloric units (J, MJ) based on Dutch gas @ 43.94 MJ/m^3', default='m3', type=click.Choice(['m3', 'l', 'J', 'MJ']))
+@click.option('--gas-index', help='if there are multiple gas meters and you\'re only interested in one, specify the index', type=int, default=None)
 @click.option('--raw', help='display packet in raw form', is_flag=True)
 @click.option('--serial-baudrate', help='baud rate such as 9600 or 115200 etc', type=int, default=115200)
 @click.option('--serial-bytesize', help='number of data bits', default=str(serial.SEVENBITS), type=click.Choice(['5', '6', '7', '8']))
@@ -17,9 +18,9 @@ from smeterd.meter import SmartMeter
 @click.option('--serial-timeout', help='set a read timeout value in seconds', default=10, type=int)
 @click.option('--serial-xonxoff', help='enable software flow control. By default software flow control is disabled', is_flag=True)
 @click.option('--serial-rts', help='Enable RTS flow control.', is_flag=True)
-@click.option('--show-output', help='choose output to display', default=('time', 'consumed', 'tariff', 'gas_measured_at'), multiple=True, type=click.Choice(['time', 'kwh_eid', 'consumed', 'tariff', 'produced', 'current', 'voltage', 'amps', 'watts', 'gas_eid', 'gas', 'gas_first_meter', 'gas_measured_at']))
+@click.option('--show-output', help='choose output to display', default=('time', 'consumed', 'tariff', 'gas_measured_at'), multiple=True, type=click.Choice(['time', 'kwh_eid', 'consumed', 'tariff', 'produced', 'current', 'voltage', 'amps', 'watts', 'gas_eid', 'gas_measured_at']))
 @click.option('--tsv', help='display packet in tab separated value form', is_flag=True)
-def read_meter(elec_unit, gas_unit, raw, serial_baudrate, serial_bytesize, serial_parity, serial_port, serial_stopbits, serial_timeout, serial_xonxoff, serial_rts, show_output, tsv):
+def read_meter(elec_unit, gas_unit, gas_index, raw, serial_baudrate, serial_bytesize, serial_parity, serial_port, serial_stopbits, serial_timeout, serial_xonxoff, serial_rts, show_output, tsv):
     '''
     read a single P1 packet to stdout.
 
@@ -57,31 +58,27 @@ def read_meter(elec_unit, gas_unit, raw, serial_baudrate, serial_bytesize, seria
         'MJ': 1000 * 3600 / 1000 / 1000
     }
     gas_unit_factor = {
-        'm3': 1000,
-        'l': 1,
-        'J': 43.935,
-        'MJ': 1000 * 43.935  # 43.46 - 44.41 MJ/m^3(n) legal Wobbe-index ('Bovenwaarde') for Dutch Groningen gas, also widely used in north-west Europe: https://wetten.overheid.nl/BWBR0035367/2019-01-01#Bijlage2
+        'l': 1000,
+        'm3': 1,
+        'J': 43935,
+        'MJ': 1000 * 43935  # 43.46 - 44.41 MJ/m^3(n) legal Wobbe-index ('Bovenwaarde') for Dutch Groningen gas, also widely used in north-west Europe: https://wetten.overheid.nl/BWBR0035367/2019-01-01#Bijlage2
     }
 
     # Construct output depending on user request
     data = []
-    if ('gas'):
-        gas_ids = keys['gas']['meter_ids']
-        if (gas_ids)
-            for gas_id in gas_ids.split(","):
-                data.append(('Gas meter [{}]'.format(gas_id), packet['gas'][gas_id]))
-
-    if ('gas_first_meter'):
-        gas_ids = keys['gas']['meter_ids']
-        if (gas_ids.split(",")[0]:
-                data.append(('Gas meter [{}]'.format(gas_id), packet['gas'][gas_id]))
+    gas_idxs = packet['gas']['index']
     
     if ('time' in show_output):
         data.append(('Time', datetime.datetime.now()))
     if ('kwh_eid' in show_output):
         data.append(('Electricity serial', packet['kwh']['eid']))
     if ('gas_eid' in show_output):
-        data.append(('Gas serial', packet['gas']['eid']))
+        gas_idxs = packet['gas']['index']
+        if (gas_idxs):
+            for gas_idx in gas_idxs.split(","):
+                if (gas_index is not None and str(gas_index) != gas_idx):
+                    continue
+                data.append(('Gas serial', packet['gas'][gas_idx]['eid']))
     if ('amps' in show_output):
         data.extend([
             ('L1 (Amps)', int(packet['instantaneous']['l1']['amps'])),
@@ -100,8 +97,15 @@ def read_meter(elec_unit, gas_unit, raw, serial_baudrate, serial_bytesize, seria
     if ('consumed' in show_output):
         data.extend([
             ('Total electricity consumed (high, {})'.format(elec_unit), int(packet['kwh']['high']['consumed'] * elec_unit_factor[elec_unit])),
-            ('Total electricity consumed (low, {})'.format(elec_unit), int(packet['kwh']['low']['consumed'] * elec_unit_factor[elec_unit])),
-            ('Total gas consumed ({})'.format(gas_unit), int(packet['gas']['total'] * gas_unit_factor[gas_unit]))])
+            ('Total electricity consumed (low, {})'.format(elec_unit), int(packet['kwh']['low']['consumed'] * elec_unit_factor[elec_unit]))])
+           
+        gas_idxs = packet['gas']['index']
+        if (gas_idxs):
+            for gas_idx in gas_idxs.split(","):
+                if (gas_index is not None and str(gas_index) != gas_idx):
+                    continue
+                data.append(('Gas meter [{}] ({})'.format(gas_idx, gas_unit), int(packet['gas'][gas_idx]['total'] * gas_unit_factor[gas_unit])))
+
     if ('produced' in show_output):
         data.extend([
             ('Total electricity produced (high, {})'.format(elec_unit), int(packet['kwh']['high']['produced'] * elec_unit_factor[elec_unit])),

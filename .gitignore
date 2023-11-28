@@ -1,3 +1,6 @@
+# script to build and copy generated .whl to C:\inetpub\wwwroot, to be downloaded to rpi
+buildsmeterd
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

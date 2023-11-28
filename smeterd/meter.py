@@ -165,31 +165,25 @@ class P1Packet(object):
         keys['instantaneous']['l3']['amps'] = self.get_int(rb'^1-0:71\.7\.0\((\d+)\*A\)\r\n')
         keys['instantaneous']['l3']['watts'] = self.get_float(rb'^1-0:61\.7\.0\((\d+\.\d+)\*kW\)\r\n', 0) * 1000
 
-        # multiple meters are possible: find partial meter id for matching lines starting with "0-x:24.2.1"
+        # multiple meters supported; find meter index x, for lines starting with "0-x:24.2.1"
         keys['gas'] = {}
-        gas_ids = get_all(rb'^0-(\d+):24\.2\.1')
-        keys['gas']['meter_ids'] = gas_ids = ','.join(result_list) if gas_ids is not None else 'None'
-        
-        for gas_id in gas_ids:            
-            keys['gas'][gas_id] = {}
-            keys['gas'][gas_id]['eid'] = self.get(rb'^0-{}:96\.1\.0\(([^)]+)\)\r\n'.format(gas_id))
-            keys['gas'][gas_id]['device_type'] = self.get_int(rb'^0-{}:24\.1\.0\((\d)+\)\r\n'.format(gas_id))
-            keys['gas'][gas_id]['total'] = 
-                self.get_float(rb'^(?:0-{}:24\.2\.1(?:\(\d+[SW]\))?)?\(([0-9]{5}\.[0-9]{3})(?:\*m3)?\)\r\n'.format(gas_id), 0)
-                or self.get_float(rb'^0-{}:24\.2\.1\((?:\d)+[W]\)\((\d+\.\d+)\*m3+\)\r\n'.format(gas_id))
-            keys['gas'][gas_id]['valve'] = self.get_int(rb'^0-{}:24\.4\.0\((\d)\)\r\n'.format(gas_id))
-    
-            measured_at = self.get(rb'^(?:0-{}:24\.[23]\.[01](?:\((\d+)[SW]?\))?)'.format(gas_id))
-            if measured_at:
-                keys['gas'][gas_id]['measured_at'] = int(mktime(datetime.strptime(measured_at, "%y%m%d%H%M%S").timetuple()))
-            else:
-                keys['gas'][gas_id]['measured_at'] = None
-                
-        keys['msg'] = {}
-        keys['msg']['code'] = self.get(rb'^0-0:96\.13\.1\((\d+)\)\r\n')
-        keys['msg']['text'] = self.get(rb'^0-0:96\.13\.0\((.+)\)\r\n')
+        gas_indexes = self.get_all(rb'^0-(\d+):24\.2\.1')
+        keys['gas']['index'] = ','.join(gas_indexes) if gas_indexes is not None else None
 
-        self._keys = key
+        for gas_index in gas_indexes:        
+            keys['gas'][gas_index] = {}
+            keys['gas'][gas_index]['eid'] = self.get('^0-{}:96\.1\.0\(([^)]+)\)\r\n'.format(gas_index).encode('utf-8'))
+            keys['gas'][gas_index]['device_type'] = self.get_int('^0-{}:24\.1\.0\((\d)+\)\r\n'.format(gas_index).encode('utf-8'))
+            keys['gas'][gas_index]['total'] = self.get_float('^0-{}:24\.2\.1\((?:\d)+[W]\)\((\d+\.\d+)\*m3+\)\r\n'.format(gas_index).encode('utf-8'))
+            keys['gas'][gas_index]['valve'] = self.get_int('^0-{}:24\.4\.0\((\d)\)\r\n'.format(gas_index).encode('utf-8'))
+                    
+            measured_at = self.get('^(?:0-{}:24\.[23]\.[01](?:\((\d+)[SW]?\))?)'.format(gas_index).encode('utf-8'))
+            if measured_at:
+                keys['gas'][gas_index]['measured_at'] = int(mktime(datetime.strptime(measured_at, "%y%m%d%H%M%S").timetuple()))
+            else:
+                keys['gas'][gas_index]['measured_at'] = None
+
+        self._keys = keys
         
     def __getitem__(self, key):
         return self._keys[key]
